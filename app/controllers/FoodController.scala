@@ -1,19 +1,20 @@
 package controllers
 
+import javax.inject.{Singleton, Inject}
+
 import models.{CreateFood, Food}
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
+import service.FoodServiceImpl
 
 
-class FoodController extends Controller {
+@Singleton
+class FoodController @Inject() (foodService: FoodServiceImpl) extends Controller {
 
   Logger.info("Food Controller instantiated")
 
   implicit val writesFoodToJson = Json.writes[Food]
-  implicit val readsFoodToJson = Json.reads[CreateFood]
-
-  val foodService = service.FoodServiceImpl
 
   val listAllFoods = Action {
     Ok(Json.toJson(foodService.listAllFoods()))
@@ -43,7 +44,7 @@ class FoodController extends Controller {
     request.body.validate[CreateFood] match {
       case JsSuccess(updateFood, _) =>
         foodService.updateFood(id, updateFood.name, updateFood.information) match {
-          case Some(item) => Ok(Json.toJson(item))
+          case Some(food) => Ok(Json.toJson(food))
           case None => InternalServerError
         }
       case JsError(errors) =>
@@ -54,5 +55,4 @@ class FoodController extends Controller {
   def deleteFood(id: Long) = Action {
     if (foodService.deleteFood(id)) Ok else BadRequest
   }
-
 }

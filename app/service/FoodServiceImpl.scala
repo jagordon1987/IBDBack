@@ -2,14 +2,13 @@ package service
 
 import java.util.concurrent.atomic.AtomicLong
 
+import com.google.inject.Singleton
 import models.Food
 
 import scala.collection.concurrent.TrieMap
 
-/**
-  * Created by John1 on 09/02/2016.
-  */
-object FoodServiceImpl extends FoodService {
+@Singleton
+class FoodServiceImpl extends FoodService {
 
   private val foods = TrieMap.empty[Long, Food]
   private val seq = new AtomicLong
